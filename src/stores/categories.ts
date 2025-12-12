@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 interface CategoryState {
     activeCategories: string[]
@@ -12,34 +11,46 @@ const allCategories = [
     'entertainment', 'technology', 'subscriptions', 'education', 'other'
 ]
 
-export const useCategoryStore = create<CategoryState>()(
-    persist(
-        (set, get) => ({
-            activeCategories: allCategories, // All active by default
+export const useCategoryStore = create<CategoryState>((set, get) => ({
+    activeCategories: allCategories, // All active by default
 
-            toggleCategory: (category: string) => {
-                set((state) => {
-                    const isCurrentlyActive = state.activeCategories.includes(category)
-                    if (isCurrentlyActive) {
-                        // Remove category
-                        return {
-                            activeCategories: state.activeCategories.filter(c => c !== category)
-                        }
-                    } else {
-                        // Add category
-                        return {
-                            activeCategories: [...state.activeCategories, category]
-                        }
-                    }
-                })
-            },
-
-            isActive: (category: string) => {
-                return get().activeCategories.includes(category)
+    toggleCategory: (category: string) => {
+        set((state) => {
+            const isCurrentlyActive = state.activeCategories.includes(category)
+            if (isCurrentlyActive) {
+                // Remove category
+                const newCategories = state.activeCategories.filter(c => c !== category)
+                // Save to localStorage
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('active-categories', JSON.stringify(newCategories))
+                }
+                return { activeCategories: newCategories }
+            } else {
+                // Add category
+                const newCategories = [...state.activeCategories, category]
+                // Save to localStorage
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('active-categories', JSON.stringify(newCategories))
+                }
+                return { activeCategories: newCategories }
             }
-        }),
-        {
-            name: 'category-storage'
+        })
+    },
+
+    isActive: (category: string) => {
+        return get().activeCategories.includes(category)
+    }
+}))
+
+// Load from localStorage on initialization
+if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('active-categories')
+    if (stored) {
+        try {
+            const categories = JSON.parse(stored)
+            useCategoryStore.setState({ activeCategories: categories })
+        } catch (e) {
+            console.error('Error loading categories from localStorage', e)
         }
-    )
-)
+    }
+}
