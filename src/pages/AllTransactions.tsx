@@ -71,7 +71,7 @@ export default function AllTransactions() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0e3b34' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#0e3b34' }}>
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Header */}
         <motion.div

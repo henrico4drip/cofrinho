@@ -175,7 +175,7 @@ export default function AddTransaction() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 md:pb-8">
+    <div className="min-h-screen bg-gray-50 pb-24 md:pb-8 overflow-x-hidden">
       <div className="max-w-3xl mx-auto px-4 py-6">
         {/* Header */}
         <motion.div
@@ -268,7 +268,7 @@ export default function AddTransaction() {
           {/* Category Selection */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Categoria</h2>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
               {activeCategories.map((cat) => {
                 const config = getCategoryConfig(cat)
                 const isSelected = formData.category === cat

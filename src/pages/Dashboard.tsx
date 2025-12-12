@@ -364,7 +364,7 @@ export default function Dashboard() {
           onClick={() => setEditFor(null)}
         >
           <motion.div
-            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto overflow-x-hidden"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             onClick={(e) => e.stopPropagation()}
@@ -413,7 +413,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Categoria</label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {activeCategories.map((cat) => {
                     const config = getCategoryConfig(cat)
                     const isSelected = editForm.category === cat
