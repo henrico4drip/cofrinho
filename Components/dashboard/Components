@@ -1,0 +1,118 @@
+import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowUpRight, ArrowDownRight, Calendar, CreditCard, Trash2, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+
+export function StatsCard({ title, value, subtext, icon: Icon, type = "neutral" }) {
+  const colors = {
+    neutral: "bg-white text-gray-900",
+    success: "bg-emerald-50 text-emerald-700",
+    warning: "bg-orange-50 text-orange-700",
+  };
+
+  const iconColors = {
+    neutral: "bg-gray-100 text-gray-600",
+    success: "bg-emerald-100 text-emerald-600",
+    warning: "bg-orange-100 text-orange-600",
+  };
+
+  return (
+    <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className={`p-3 rounded-full ${iconColors[type]}`}>
+            <Icon className="w-5 h-5" />
+          </div>
+          {type === 'success' && <ArrowUpRight className="w-4 h-4 text-emerald-500" />}
+          {type === 'warning' && <ArrowDownRight className="w-4 h-4 text-orange-500" />}
+        </div>
+        <h3 className="text-sm font-medium text-gray-500 mb-1">{title}</h3>
+        <div className="text-2xl font-bold tracking-tight">{value}</div>
+        {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+      </CardContent>
+    </Card>
+  );
+}
+
+export function TransactionItem({ transaction }) {
+  const queryClient = useQueryClient();
+  
+  const deleteMutation = useMutation({
+    mutationFn: () => base44.entities.Transaction.delete(transaction.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    }
+  });
+
+  const handleDelete = (e) => {
+    e.preventDefault(); // Prevent navigation if inside a link
+    if (window.confirm('Tem certeza que deseja excluir este gasto?')) {
+      deleteMutation.mutate();
+    }
+  };
+
+  const date = new Date(transaction.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  
+  const categoryIcons = {
+    food: "🍔",
+    transport: "🚗",
+    shopping: "🛍️",
+    services: "💡",
+    entertainment: "🎬",
+    health: "💊",
+    other: "📦"
+  };
+
+  const paymentLabels = {
+    credit_card: "Crédito",
+    debit_card: "Débito",
+    pix: "Pix",
+    cash: "Dinheiro",
+    other: "Outro"
+  };
+
+  return (
+    <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:border-emerald-100 transition-colors group relative">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-lg">
+          {categoryIcons[transaction.category] || "📦"}
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-900">{transaction.vendor}</h4>
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span>{date}</span>
+            <span>•</span>
+            <span>{paymentLabels[transaction.payment_method]}</span>
+            {transaction.installments > 1 && (
+              <span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                {transaction.installments}x
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        <span className="font-bold text-gray-900">
+          -R$ {transaction.amount?.toFixed(2).replace('.', ',')}
+        </span>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-600 hover:bg-red-50"
+          onClick={handleDelete}
+          disabled={deleteMutation.isPending}
+        >
+          {deleteMutation.isPending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Trash2 className="w-4 h-4" />
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}
