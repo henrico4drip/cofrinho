@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/auth'
 import { Link, useNavigate } from 'react-router-dom'
-import { LogOut, BarChart3, CreditCard as CreditCardIcon, PiggyBank, PieChart, Menu } from 'lucide-react'
+import { LogOut, BarChart3, CreditCard as CreditCardIcon, PiggyBank, PieChart, Menu, Settings } from 'lucide-react'
 import { useState } from 'react'
 import PiggyBankLogo from './PiggyBankLogo'
 
@@ -27,7 +27,7 @@ export default function Header() {
               <PiggyBank className="h-5 w-5 text-emerald-600 mr-2" />
               Cofrin
             </Link>
-            
+
             <nav className="hidden md:flex space-x-6">
               <Link
                 to="/dashboard"
@@ -77,9 +77,13 @@ export default function Header() {
       {mobileOpen && (
         <div className="md:hidden fixed top-16 inset-x-0 z-30 bg-white border-b border-gray-200">
           <div className="px-4 py-3 space-y-2">
-            <Link to="/dashboard" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">Dashboard</Link>
-            <Link to="/credit-cards" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">Cartões</Link>
-            <Link to="/all-transactions" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50">Todos os Gastos</Link>
+            <Link to="/dashboard" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+            <Link to="/credit-cards" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>Cartões</Link>
+            <Link to="/all-transactions" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>Todos os Gastos</Link>
+            <Link to="/settings" className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+              <Settings className="h-4 w-4" />
+              Configurações
+            </Link>
           </div>
         </div>
       )}

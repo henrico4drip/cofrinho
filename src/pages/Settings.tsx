@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/auth'
+import { useCategoryStore } from '@/stores/categories'
 import { supabase } from '@/lib/supabase'
-import { ArrowLeft, User, Save, Palette } from 'lucide-react'
+import { ArrowLeft, User, Save, Palette, Eye, EyeOff } from 'lucide-react'
 import CategoryIcon from '@/components/CategoryIcon'
 import { getCategoryConfig } from '@/config/categoryConfig'
 
 export default function Settings() {
     const navigate = useNavigate()
     const { user, checkUser } = useAuthStore()
+    const { activeCategories, toggleCategory, isActive } = useCategoryStore()
 
     const [fullName, setFullName] = useState('')
     const [loading, setLoading] = useState(false)
@@ -48,7 +50,7 @@ export default function Settings() {
         }
     }
 
-    const categories = [
+    const allCategories = [
         'food', 'transport', 'shopping', 'services', 'health',
         'entertainment', 'technology', 'subscriptions', 'education', 'other'
     ]
@@ -161,32 +163,47 @@ export default function Settings() {
                             <Palette className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Categorias Disponíveis</h2>
-                            <p className="text-sm text-gray-600">Visualize todas as categorias de transações</p>
+                            <h2 className="text-xl font-semibold text-gray-900">Gerenciar Categorias</h2>
+                            <p className="text-sm text-gray-600">Ative ou desative categorias para suas transações</p>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {categories.map((category) => {
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {allCategories.map((category) => {
                             const config = getCategoryConfig(category)
+                            const active = isActive(category)
                             return (
-                                <div
+                                <button
                                     key={category}
-                                    className="flex flex-col items-center p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                                    onClick={() => toggleCategory(category)}
+                                    className={`flex flex-col items-center p-4 rounded-xl transition-all relative ${active
+                                            ? 'bg-emerald-50 ring-2 ring-emerald-500'
+                                            : 'bg-gray-100 opacity-50'
+                                        }`}
                                 >
+                                    <div className="absolute top-2 right-2">
+                                        {active ? (
+                                            <Eye className="h-4 w-4 text-emerald-600" />
+                                        ) : (
+                                            <EyeOff className="h-4 w-4 text-gray-400" />
+                                        )}
+                                    </div>
                                     <CategoryIcon category={category} size="md" />
                                     <span className="text-sm font-medium text-gray-700 mt-2 text-center">
                                         {config.label}
                                     </span>
-                                </div>
+                                    <span className="text-xs text-gray-500 mt-1">
+                                        {active ? 'Ativa' : 'Inativa'}
+                                    </span>
+                                </button>
                             )
                         })}
                     </div>
 
                     <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                         <p className="text-sm text-blue-800">
-                            <strong>💡 Dica:</strong> As categorias são fixas e otimizadas para melhor organização dos seus gastos.
-                            Você pode usar a categoria "Outros" para transações que não se encaixam nas demais.
+                            <strong>💡 Dica:</strong> As categorias inativas não aparecerão ao criar novas transações.
+                            Você tem <strong>{activeCategories.length}</strong> categoria{activeCategories.length !== 1 ? 's' : ''} ativa{activeCategories.length !== 1 ? 's' : ''}.
                         </p>
                     </div>
                 </motion.div>

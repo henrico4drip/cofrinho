@@ -4,9 +4,10 @@ import type { Transaction } from '@/types/database'
 import { useAuthStore } from '@/stores/auth'
 import { useTransactionsStore } from '@/stores/transactions'
 import { useCreditCardsStore } from '@/stores/credit-cards'
+import { useCategoryStore } from '@/stores/categories'
 import { getCreditCardChargesByDueMonth } from '@/lib/db'
 import { Link } from 'react-router-dom'
-import { Wallet, CreditCard, TrendingDown, Plus, ChevronLeft, ChevronRight, Trash, Pencil, X, Settings as SettingsIcon } from 'lucide-react'
+import { Wallet, CreditCard, TrendingDown, Plus, ChevronLeft, ChevronRight, Trash, Pencil, X } from 'lucide-react'
 import CategoryIcon from '@/components/CategoryIcon'
 import { getCategoryConfig } from '@/config/categoryConfig'
 
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const { user } = useAuthStore()
   const { transactions, fetchTransactions, deleteTransaction, deleteTransactionGroup, updateTransaction, updateTransactionGroup } = useTransactionsStore()
   const { fetchCreditCards } = useCreditCardsStore()
+  const { activeCategories } = useCategoryStore()
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const [monthTotal, setMonthTotal] = useState(0)
@@ -83,7 +85,7 @@ export default function Dashboard() {
     return new Date(dateString).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
   }
 
-  const categories = ['food', 'transport', 'shopping', 'services', 'health', 'entertainment', 'technology', 'subscriptions', 'education', 'other']
+
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24 md:pb-8">
@@ -278,25 +280,18 @@ export default function Dashboard() {
         </motion.div>
         {/* Mobile Action Bar */}
         <div className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white border-t border-gray-200 p-3">
-          <div className="max-w-7xl mx-auto px-2 grid grid-cols-3 gap-2">
+          <div className="max-w-7xl mx-auto px-2 flex items-center justify-between gap-3">
             <Link
               to="/all-transactions"
-              className="px-3 py-3 rounded-xl border-2 border-emerald-200 text-emerald-700 text-center font-medium hover:bg-emerald-50 text-sm"
+              className="flex-1 px-4 py-3 rounded-xl border-2 border-emerald-200 text-emerald-700 text-center font-medium hover:bg-emerald-50"
             >
               Todos os Gastos
             </Link>
             <Link
               to="/add-transaction"
-              className="px-3 py-3 rounded-xl bg-emerald-600 text-white text-center font-medium hover:bg-emerald-700 text-sm"
+              className="flex-1 px-4 py-3 rounded-xl bg-emerald-600 text-white text-center font-medium hover:bg-emerald-700"
             >
               Nova Transação
-            </Link>
-            <Link
-              to="/settings"
-              className="px-3 py-3 rounded-xl border-2 border-gray-300 text-gray-700 text-center font-medium hover:bg-gray-50 flex items-center justify-center gap-1 text-sm"
-            >
-              <SettingsIcon className="h-4 w-4" />
-              Config
             </Link>
           </div>
         </div>
@@ -419,7 +414,7 @@ export default function Dashboard() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Categoria</label>
                 <div className="grid grid-cols-4 gap-2">
-                  {categories.map((cat) => {
+                  {activeCategories.map((cat) => {
                     const config = getCategoryConfig(cat)
                     const isSelected = editForm.category === cat
                     return (

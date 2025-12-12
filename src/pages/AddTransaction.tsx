@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/auth'
 import { useTransactionsStore } from '@/stores/transactions'
 import { useCreditCardsStore } from '@/stores/credit-cards'
+import { useCategoryStore } from '@/stores/categories'
 import { ArrowLeft, CreditCard as CreditCardIcon, Plus, X } from 'lucide-react'
 import { getStatementAndDueMonth, getDueDate } from '@/utils/billing'
 import CategoryIcon from '@/components/CategoryIcon'
@@ -15,6 +16,7 @@ export default function AddTransaction() {
   const { user, checkUser } = useAuthStore()
   const { addTransaction, addMultipleTransactions } = useTransactionsStore()
   const { creditCards, fetchCreditCards, addCreditCard } = useCreditCardsStore()
+  const { activeCategories } = useCategoryStore()
 
   type TransactionForm = {
     vendor: string
@@ -164,11 +166,6 @@ export default function AddTransaction() {
     }
   }
 
-  const categories = [
-    'food', 'transport', 'shopping', 'services', 'health',
-    'entertainment', 'technology', 'subscriptions', 'education', 'other'
-  ]
-
   const paymentMethods = [
     { value: 'credit_card', label: 'Cartão de Crédito', icon: '💳' },
     { value: 'debit_card', label: 'Cartão de Débito', icon: '💳' },
@@ -272,7 +269,7 @@ export default function AddTransaction() {
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Categoria</h2>
             <div className="grid grid-cols-5 gap-3">
-              {categories.map((cat) => {
+              {activeCategories.map((cat) => {
                 const config = getCategoryConfig(cat)
                 const isSelected = formData.category === cat
                 return (
